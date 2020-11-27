@@ -1,0 +1,21 @@
+
+def (main)
+
+new (8)
+3
+
+[=3 # this is a condition, you read this as:
+    #        "if (number in stack) equals 3 then..."
+    # this is the body of the condition, if the condition is true
+    # it executes, and i will add the >=, >, !, < operators soon
+    
+    # oh! and if you are wondering, yes, 3 is still in the stack
+    
+    select (8)
+    . . . . (1 4 2 5)
+    emit ("look at the first stack, 3 is still in there!" ASC LEN)
+]
+
+endef
+
+main

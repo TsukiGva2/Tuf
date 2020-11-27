@@ -1,0 +1,19 @@
+def (main) # main "word", technically a function
+
+new (3)
+select (3) 
+
+emit ("hey" ASC LEN)
+	   # look at the "example.tuf" file
+
+CB	   # clearing the string "buffer"
+1	   # pushing 1 onto the stack
+2	   # pushing 2 onto the stack and then 3
+3
+. . .	   # this is an actual command
+	   # here we are printing the first 3 items of the stack
+
+endef      # end definition of main
+
+main 	   # executing main
+

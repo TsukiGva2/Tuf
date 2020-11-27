@@ -69,7 +69,7 @@ def chstack():
     global sstk
     news = stck[sstk].pop()
     try:
-        print(stck[news])
+        dummy = stck[news]
         sstk = news
         return True
     except KeyError:
@@ -118,24 +118,24 @@ def conditional(word):
     return True
 
 def checkEq(): 
-    global ignore # gambiarra merda, mudar isso um dia.
-    """                 .ROGER.
-    --- esse comando e estruturado como 'eq (1 2)'...
-    ... 1 e 2 sao colocados na stack e entao a igualdade...
-    ... entre eles e verificada. -- teclado sem acentos :p --
-                        .ROGER.                         """
+    global ignore # change this someday
+    """                 .Tsuki.
+    --- this command is structured as: 'eq (1 2)'...
+    ... 1 and 2 are pushed onto the stack and then...
+    ... we check 1 == 2 -----------------------------------
+                        .Tsuki.                         """
     if stck[sstk].pop() != stck[sstk].pop():
         ignore += 1
 
 def skipp():
     if stck[sstk]:
-
+        ignore += stck[sstk].pop()
 
 _reserved = {"def":defun,"ASC":getasc,"LEN":getbuflen
         ,"emit":emitsome,".":prntsome,"CB":clbuf
         ,"new":new_stack,"select":chstack,"add":s_add
         ,"sub":s_sub,"mul":s_mul,"div":s_div,"pow":s_pow
-        ,"eq":checkEq}
+        ,"eq":checkEq,"skip":skipp}
 
 if len(argv) < 2:
     print("too few arguments! Usage: python tuf.py -f somefile.tuf")
@@ -152,8 +152,10 @@ for ln, pl in enumerate(code.splitlines()):
     linum = ln+1
     if re.search("^\\s*\\t*$",pl) != None:
         continue
-    if "#" in pl:
-        line = pl.strip(pl[pl.index("#"):])
+    the_hash_char = re.search("\#(.*)",pl)
+    if the_hash_char != None:
+        line = pl.replace(the_hash_char.group(),"")
+        print(line)
     else:
         line = pl
     line = line.replace("$",'')
@@ -196,7 +198,6 @@ def execute(word):
                     conditionals_temp.pop()
             else:
                 conditionals_temp[-1].append(word)
-            print(is_in_condition)
         if not is_in_def[0] and not is_in_condition[-1][0]:
             if re.search("^\d+$",word) != None:
                 stck[sstk].append(int(word))
