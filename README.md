@@ -5,7 +5,7 @@ Tuf is an abreviation of stack stuff, this is a stack based programming language
 ```python
 def (main)
 
-stack (3 [])
+new (3)
 select (3)
 
 emit ("hey" ASC LEN)
