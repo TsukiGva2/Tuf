@@ -9,18 +9,36 @@ tdpn = {}
 stck = deque()
 utks = {}
 ufun = {}
+sbuf = ""
 undefs = deque()
 sstk = [False, 0]
 is_in_def = [False, "none"]
+
+def setbuf(word):
+    global sbuf
+    string = re.search("\$(.+?)\$", word)
+    if string != None:
+        sbuf = strs[int(string.group(1))]
+    else:
+        return False
+    return True
+
+def getasc():
+    if sbuf != "":
+        for char in sbuf:
+            if sstk[0] == False:
+                stck.append(ord(char))
+    return True
 
 def defun():
     global is_in_def
     if not is_in_def[0] and undefs:
         neword = str(undefs.pop())
-        is_in_def = [True, ]
-        ufun[
+        is_in_def = [True, neword]
+        ufun[neword] = []
+    return True
 
-_reserved = {"def":defun}
+_reserved = {"def":defun,"ASC":getasc,"LEN":getbuflen}
 
 if len(argv) < 2:
     print("too few arguments! Usage: python stuff.py -f somefile.tuf")
@@ -41,6 +59,7 @@ for ln, pl in enumerate(code.splitlines()):
         line = pl.strip(pl[pl.index("#"):])
     else:
         line = pl
+    line = line.replace("$",'')
     paren = re.search("\((.+?)\)",line)
     quot = re.search("\"(.+?)\"",line)
     if quot!=None and re.search("\((.+?)\)",line.strip(quot.group()))==None:
@@ -55,9 +74,9 @@ for ln, pl in enumerate(code.splitlines()):
     if quot != None:
         strs[linum] = quot.group(1)
         if paren == None:
-            full[linum] = line.replace(quot.group(),"$").split()
+            full[linum] = line.replace(quot.group(),"$" + str(linum) + "$").split()
         else:
-            full[linum] = full[linum].replace(quot.group(),"$").split()
+            full[linum] = full[linum].replace(quot.group(),"$" + str(linum) + "$").split()
         continue
     full[linum] = line.split()
 
@@ -85,6 +104,8 @@ def execute(word):
             elif word in ufun:
                 for wd in ufun[word]:
                     execute(wd)
+            elif "$" in word:
+                setbuf(word)
     else:
         if word != "endef":
             ufun[is_in_def[1]].append(word)
@@ -95,7 +116,13 @@ for line in full.keys():
     for word in full[line]:
         if word not in _reserved and word not in ufun:
             undefs.append(word)
-        execute(word)
+        if "-p" in argv or "--step-mode" in argv:
+            execute(word)
+            print("stack: " + str(stck))
+            print("functions: " + str(ufun))
+            raw_input()
+        else:
+            execute(word)
 
 print("\nuser created stacks: " + str(utks))
 print("\nstack: " + str(stck))
