@@ -1,0 +1,55 @@
+# A stuff programming example
+
+
+
+#---------------------------------------------------------
+	stack (2 []) 
+#---------------------------------------------------------
+# here we created an empty stack
+# the parentheses mean: `do this first`, i use them for readability
+# you can also write this command as: 2 [] stack
+# it`s because first you have to put the reuired arguments on the main
+# stack, so, we put the name of the new stack and it`s default value
+#---------------------------------------------------------
+
+
+#---------------------------------------------------------
+	def main
+#---------------------------------------------------------
+# this is where the program begins, you use : to define a word, a word
+# is like a function in other languages
+#---------------------------------------------------------
+
+
+#---------------------------------------------------------
+	select (2)
+#---------------------------------------------------------
+# here we select our new stack, use "select (main)" to go back
+#---------------------------------------------------------
+
+
+#---------------------------------------------------------
+	emit ("hello world" ASC LEN)
+#---------------------------------------------------------
+# here we first put the ASCII value of the string "hello world" on the
+# stack using the ASC command, we need to do that because strings on the
+# program are stored in a temporary buffer since the stack can only
+# handle numbers. So, after doing that we then used LEN, since our string
+# is still on the buffer we can still do things with it, so we used LEN
+# to get the string`s length, we did that because EMIT takes two arguments
+# 1 -> the string(in ascii); 2 -> the string`s size.
+#---------------------------------------------------------
+
+
+#---------------------------------------------------------
+	CB
+#---------------------------------------------------------
+# CB(clear buffer), clears the string buffer
+#---------------------------------------------------------
+
+	
+#---------------------------------------------------------
+	endef
+#---------------------------------------------------------
+# this ends the word/function definition
+#---------------------------------------------------------
