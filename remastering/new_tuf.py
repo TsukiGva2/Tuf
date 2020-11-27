@@ -5,9 +5,32 @@ import re
 full        = {}
 strings     = {}
 functions   = {}
+in_defun    = False
 stacks      = {0:deque()}
+selected    = 0
 extra_funcs = [[]]
 tests       = [[False,"0 1 ne"]]
+sbuf        = ""
+
+def setsbuf(word):
+    global sbuf
+    index = re.search("\$(.+?)\$")
+    if index != None:
+        sbuf = strings[int(string.group(1))][::-1]
+    else:
+        return False
+    return True
+
+reserved = {"ASC":getasc,"LEN"|}
+
+def execute(word):
+    if not in_defun:
+        if word in reserved:
+            reserved[word]()
+        if word in functions:
+            execute(functions[word])
+        if "$" in word:
+            setsbuf(word)
 
 # NOTE this part of the code is still ugly.
 # -------------------------------------------
@@ -33,11 +56,11 @@ for linum, line in enumerate(code.splitlines()):
     
     cut            = re.findall("\_(.+?)\_",line) # match _this_
     # end of regexes
+    
+    line = line.replace("$","")
 
     for x in cut:
-        line = line.replace(x,"")
-    
-    line = line.replace("_","")
+        line = line.replace("_"+x+"_","")
 
     if is_string != None:
         strings[linum] = is_string.group(1)
@@ -51,6 +74,7 @@ for linum, line in enumerate(code.splitlines()):
 
     full[linum] = line.split()
 
-if "--debug" in argv:
-    for word in full.items():
+for word in full.items():
+    if "--debug" in argv:
         print(word)
+    execute(word)
