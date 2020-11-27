@@ -1,0 +1,10 @@
+def main
+
+emit ("hey" ASC LEN)
+CB
+1
+2
+3
+. . .
+
+endef

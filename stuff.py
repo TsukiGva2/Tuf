@@ -20,7 +20,6 @@ with open(argv[argv.index("-f")+1]) as f:
     code = f.read()
 
 for linum, line in enumerate(code.splitlines()):
-    print(linum)
     if line.startswith("#") or re.search("^\\s*\\t*$",line) != None:
         continue
     paren = re.search("\((.+?)\)",line)
@@ -29,7 +28,7 @@ for linum, line in enumerate(code.splitlines()):
         paren = None
     if paren != None:
         prec[linum] = paren.group(1)
-        full[linum] = line.strip(paren.group()).split()
+        full[linum] = line.replace(paren.group(),"%").split()
         if quot == None:
             prec[linum] = prec[linum].split()
             continue
@@ -42,7 +41,7 @@ for linum, line in enumerate(code.splitlines()):
         continue
     full[linum] = line.split()
 
-print(full)
+print("\nnormal operations: " + str(full))
 print("\nstrings: " + str(strs))
 print("\nprecedence operations: " + str(prec))
 print("\nstack: " + str(stck))
