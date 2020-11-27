@@ -1,0 +1,19 @@
+def (main)
+
+_if_ 1 2 eq _then_ # if statement, checking the equality of the two numbers
+		   # on the stack.
+		
+		   # NOTE:
+		   # 	_if_ and _then_ will be removed,
+		   # 	they are like small comments you can put
+		   # 	between commands
+
+	emit ("1 and 2 are not equal so this will never happen" ASC LEN)
+
+qe	 	   # closing the "eq"
+
+1 2 3 . . .
+
+endef
+
+main
