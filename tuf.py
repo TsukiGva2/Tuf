@@ -9,8 +9,18 @@ tdpn = {}
 stck = deque()
 utks = {}
 ufun = {}
+undefs = deque()
 sstk = [False, 0]
-reserved = {}
+is_in_def = [False, "none"]
+
+def defun():
+    global is_in_def
+    if not is_in_def[0] and undefs:
+        neword = str(undefs.pop())
+        is_in_def = [True, ]
+        ufun[
+
+_reserved = {"def":defun}
 
 if len(argv) < 2:
     print("too few arguments! Usage: python stuff.py -f somefile.tuf")
@@ -23,10 +33,14 @@ elif "-f" not in argv:
 with open(argv[argv.index("-f")+1]) as f:
     code = f.read()
 
-for ln, line in enumerate(code.splitlines()):
+for ln, pl in enumerate(code.splitlines()):
     linum = ln+1
-    if line.startswith("#") or re.search("^\\s*\\t*$",line) != None:
+    if re.search("^\\s*\\t*$",pl) != None:
         continue
+    if "#" in pl:
+        line = pl.strip(pl[pl.index("#"):])
+    else:
+        line = pl
     paren = re.search("\((.+?)\)",line)
     quot = re.search("\"(.+?)\"",line)
     if quot!=None and re.search("\((.+?)\)",line.strip(quot.group()))==None:
@@ -57,7 +71,31 @@ if "-d" in argv or "--debug" in argv:
     print("\nuser created stacks: " + str(utks))
 
 def execute(word):
-    if re.search("^\d+$",word) != None:
-        if sstk[0] == False:
-            stck.append(int(word))
+    global is_in_def
+    if not is_in_def[0]:
+        if re.search("^\d+$",word) != None:
+            if sstk[0] == False:
+                stck.append(int(word))
+            else:
+                utks[sstk[1]].append(int(word))
+            return True
+        else:
+            if word in _reserved:
+                _reserved[word]()
+            elif word in ufun:
+                for wd in ufun[word]:
+                    execute(wd)
+    else:
+        if word != "endef":
+            ufun[is_in_def[1]].append(word)
+        else:
+            is_in_def[0] = False
 
+for line in full.keys():
+    for word in full[line]:
+        if word not in _reserved and word not in ufun:
+            undefs.append(word)
+        execute(word)
+
+print("\nuser created stacks: " + str(utks))
+print("\nstack: " + str(stck))
