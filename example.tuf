@@ -3,7 +3,7 @@
 
 
 #---------------------------------------------------------
-	stack (2 []) 
+	new (2)
 #---------------------------------------------------------
 # here we created an empty stack
 # the parentheses mean: `do this first`, i use them for readability
