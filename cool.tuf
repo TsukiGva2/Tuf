@@ -19,6 +19,8 @@ new (9)
 select (9)
 1 1 add
 
-[2
- 
+[=2
+ 1 2 add 3 pow 9 9 div
+ eq (1) .
 ]
+
