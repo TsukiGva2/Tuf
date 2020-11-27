@@ -8,6 +8,9 @@ strs = {}
 tdpn = {}
 stck = deque()
 utks = {}
+ufun = {}
+sstk = [False, 0]
+reserved = {}
 
 if len(argv) < 2:
     print("too few arguments! Usage: python stuff.py -f somefile.tuf")
@@ -53,5 +56,8 @@ if "-d" in argv or "--debug" in argv:
     print("\ntime dependent operations: " + str(tdpn))
     print("\nuser created stacks: " + str(utks))
 
-for line, op in full.keys(), full.items():
+def execute(word):
+    if re.search("^\d+$",word) != None:
+        if sstk[0] == False:
+            stck.append(int(word))
 
