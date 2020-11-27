@@ -6,19 +6,30 @@ full = {}
 prec = {}
 strs = {}
 tdpn = {}
-stck = deque()
+stck = {0:deque()}
 utks = {}
 ufun = {}
 sbuf = ""
 undefs = deque()
-sstk = [False, 0]
+sstk = 0  
 is_in_def = [False, "none"]
+
+def emitsome():
+    result = ""
+    if stck[sstk]:
+        length = stck[sstk].pop()
+        for x in range(length):
+            result += chr(stck[sstk].pop())
+        print(result)
+
+def getbuflen():
+    stck[sstk].append(len(sbuf))
 
 def setbuf(word):
     global sbuf
     string = re.search("\$(.+?)\$", word)
     if string != None:
-        sbuf = strs[int(string.group(1))]
+        sbuf = strs[int(string.group(1))][::-1]
     else:
         return False
     return True
@@ -26,8 +37,7 @@ def setbuf(word):
 def getasc():
     if sbuf != "":
         for char in sbuf:
-            if sstk[0] == False:
-                stck.append(ord(char))
+            stck[sstk].append(ord(char))
     return True
 
 def defun():
@@ -38,7 +48,7 @@ def defun():
         ufun[neword] = []
     return True
 
-_reserved = {"def":defun,"ASC":getasc,"LEN":getbuflen}
+_reserved = {"def":defun,"ASC":getasc,"LEN":getbuflen,"emit":emitsome}
 
 if len(argv) < 2:
     print("too few arguments! Usage: python stuff.py -f somefile.tuf")
@@ -85,18 +95,14 @@ if "-d" in argv or "--debug" in argv:
         print(item)
     print("\nstrings: " + str(strs))
     print("\nprecedence operations: " + str(prec))
-    print("\nstack: " + str(stck))
+    print("\nstacks: " + str(stck))
     print("\ntime dependent operations: " + str(tdpn))
-    print("\nuser created stacks: " + str(utks))
 
 def execute(word):
     global is_in_def
     if not is_in_def[0]:
         if re.search("^\d+$",word) != None:
-            if sstk[0] == False:
-                stck.append(int(word))
-            else:
-                utks[sstk[1]].append(int(word))
+            stck[sstk].append(int(word))
             return True
         else:
             if word in _reserved:
@@ -116,9 +122,9 @@ for line in full.keys():
     for word in full[line]:
         if word not in _reserved and word not in ufun:
             undefs.append(word)
-        if "-p" in argv or "--step-mode" in argv:
+        if "-d" in argv or "--debug" in argv:
             execute(word)
-            print("stack: " + str(stck))
+            print("stacks: " + str(stck))
             print("functions: " + str(ufun))
             raw_input()
         else:
