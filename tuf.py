@@ -1,3 +1,4 @@
+from collections import deque
 from sys import argv, exit
 import re
 
@@ -5,7 +6,7 @@ full = {}
 prec = {}
 strs = {}
 tdpn = {}
-stck = []
+stck = deque()
 utks = {}
 
 if len(argv) < 2:
@@ -19,7 +20,8 @@ elif "-f" not in argv:
 with open(argv[argv.index("-f")+1]) as f:
     code = f.read()
 
-for linum, line in enumerate(code.splitlines()):
+for ln, line in enumerate(code.splitlines()):
+    linum = ln+1
     if line.startswith("#") or re.search("^\\s*\\t*$",line) != None:
         continue
     paren = re.search("\((.+?)\)",line)
@@ -29,15 +31,10 @@ for linum, line in enumerate(code.splitlines()):
     if paren != None:
         prec[linum] = paren.group(1)
         if quot == None:
-            full[linum] = line.replace(paren.group(),"%").split()
-        else:
-            full[linum] = line.replace(paren.group(),"%")
-        if quot == None:
-            prec[linum] = prec[linum].split()
+            full[linum] = (prec[linum] + " " + line.replace(paren.group(),"")).split()
             continue
         else:
-            prec[linum] = prec[linum].replace(quot.group(),"$")
-        prec[linum] = prec[linum].split()
+            full[linum] = prec[linum] + " " + line.replace(paren.group(),"")
     if quot != None:
         strs[linum] = quot.group(1)
         if paren == None:
@@ -48,11 +45,13 @@ for linum, line in enumerate(code.splitlines()):
     full[linum] = line.split()
 
 if "-d" in argv or "--debug" in argv:
-    print("\nnormal operations: " + str(full))
+    for item in full.items():
+        print(item)
     print("\nstrings: " + str(strs))
     print("\nprecedence operations: " + str(prec))
     print("\nstack: " + str(stck))
     print("\ntime dependent operations: " + str(tdpn))
     print("\nuser created stacks: " + str(utks))
 
+for line, op in full.keys(), full.items():
 

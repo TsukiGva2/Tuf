@@ -1,5 +1,8 @@
 def main
 
+stack (3 [])
+select (3)
+
 emit ("hey" ASC LEN)
 CB
 1
