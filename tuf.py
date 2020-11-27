@@ -14,6 +14,9 @@ undefs = deque()
 sstk = 0  
 is_in_def = [False, "none"]
 
+def prntsome():
+    print(str(stck[sstk].pop()))
+
 def emitsome():
     result = ""
     if stck[sstk]:
@@ -21,9 +24,11 @@ def emitsome():
         for x in range(length):
             result += chr(stck[sstk].pop())
         print(result)
+    return True
 
 def getbuflen():
     stck[sstk].append(len(sbuf))
+    return True
 
 def setbuf(word):
     global sbuf
@@ -48,7 +53,64 @@ def defun():
         ufun[neword] = []
     return True
 
-_reserved = {"def":defun,"ASC":getasc,"LEN":getbuflen,"emit":emitsome}
+def clbuf():
+    global sbuf
+    sbuf = ""
+    return True
+
+def new_stack():
+    global stck
+    stck[stck[sstk].pop()] = deque()
+    return True
+
+def chstack():
+    global sstk
+    news = stck[sstk].pop()
+    try:
+        print(stck[news])
+        sstk = news
+        return True
+    except KeyError:
+        return False
+
+def s_add():
+    num1 = stck[sstk].pop()
+    num2 = stck[sstk].pop()
+    stck[sstk].append(num1 + num2)
+    return True
+
+def s_sub():
+    num1 = stck[sstk].pop()
+    num2 = stck[sstk].pop()
+    stck[sstk].append(num1 - num2)
+    return True
+
+def s_mul():
+    num1 = stck[sstk].pop()
+    num2 = stck[sstk].pop()
+    stck[sstk].append(num1 * num2)
+    return True
+
+def s_div():
+    num1 = stck[sstk].pop()
+    num2 = stck[sstk].pop()
+    if num2 != 0:
+        stck[sstk].append(num1 / num2)
+    else:
+        print("zero division error")
+        return False
+    return True
+
+def s_pow():
+    num1 = stck[sstk].pop()
+    num2 = stck[sstk].pop()
+    stck[sstk].append(num1 ** num2)
+    return True
+
+_reserved = {"def":defun,"ASC":getasc,"LEN":getbuflen
+        ,"emit":emitsome,".":prntsome,"CB":clbuf
+        ,"new":new_stack,"select":chstack,"add":s_add
+        ,"sub":s_sub,"mul":s_mul,"div":s_div,"pow":s_pow}
 
 if len(argv) < 2:
     print("too few arguments! Usage: python stuff.py -f somefile.tuf")
@@ -130,5 +192,4 @@ for line in full.keys():
         else:
             execute(word)
 
-print("\nuser created stacks: " + str(utks))
-print("\nstack: " + str(stck))
+print("\nstacks: " + str(stck))

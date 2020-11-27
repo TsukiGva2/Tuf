@@ -1,6 +1,6 @@
-def (main)
+def (main) # main "word", technically a function
 
-stack (3 [])
+new (3)
 select (3)
 
 emit ("hey" ASC LEN)
@@ -12,4 +12,13 @@ CB
 
 endef
 
-main
+main # executing main
+
+3 2 pow
+new (9)
+select (9)
+1 1 add
+
+[2
+ 
+]
