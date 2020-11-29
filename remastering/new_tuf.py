@@ -2,29 +2,55 @@ from collections import deque
 from sys import argv, exit
 import re
 
-full        = {}
-strings     = {}
-functions   = {}
-in_defun    = False
-stacks      = {0:deque()}
-selected    = 0
-extra_funcs = [[]]
-tests       = [[False,"0 1 ne"]]
-sbuf        = ""
+full         = {}
+strings      = {}
+functions    = {}
+in_defun     = False
+stacks       = {0:deque()}
+selected     = 0
+extra_funcs  = [[]]
+tests        = [[False,"0 1 ne"]]
+sbuf         = ""
 
 def setsbuf(word):
     global sbuf
-    index = re.search("\$(.+?)\$")
+    index = re.search("\$(.+?)\$",word)
     if index != None:
-        sbuf = strings[int(string.group(1))][::-1]
+        sbuf = strings[int(index.group(1))][::-1]
     else:
         return False
     return True
 
-reserved = {"ASC":getasc,"LEN"|}
+def getasc():
+    for char in sbuf:
+        stacks[selected].append(ord(char))
+    return True
+
+def getbuflen():
+    stacks[selected].append(len(sbuf))
+    return True
+    
+def emit_stack():
+    count = stacks[selected].pop()
+    result = ""
+    for x in range(count):
+        result += chr(stacks[selected].pop())
+    print(result)
+    return True
+
+def testeq():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    if num1 == num2:
+        in_condition = True
+
+reserved = {"ASC":getasc,"LEN":getbuflen,"emit":emit_stack,"eq":testeq}
 
 def execute(word):
     if not in_defun:
+        isnum = re.search("^\d+$",word)
+        if isnum:
+            stacks[selected].append(int(word))
         if word in reserved:
             reserved[word]()
         if word in functions:
@@ -74,7 +100,7 @@ for linum, line in enumerate(code.splitlines()):
 
     full[linum] = line.split()
 
-for word in full.items():
-    if "--debug" in argv:
-        print(word)
-    execute(word)
+for line in full.keys():
+    for word in full[line]:
+        execute(word)
+    

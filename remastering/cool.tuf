@@ -1,0 +1,7 @@
+def main
+    1 2 eq
+        emit ("no" ASC LEN)
+    qe
+endef
+
+main
