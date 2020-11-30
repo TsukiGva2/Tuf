@@ -1,6 +1,17 @@
 def main
-    1 2 eq
-        emit ("no" ASC LEN)
+    2 2 eq
+	2 2 eq
+		1 2 eq
+        		emit ("no" ASC LEN)
+		qe
+	qe
+    qe
+    2 2 eq
+	2 2 eq
+		2 2 eq
+        		emit ("yes" ASC LEN)
+		qe
+	qe
     qe
 endef
 

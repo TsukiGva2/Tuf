@@ -9,8 +9,9 @@ in_defun     = False
 stacks       = {0:deque()}
 selected     = 0
 extra_funcs  = [[]]
-tests        = [[False,"0 1 ne"]]
+in_condition = deque([False])
 sbuf         = ""
+closers      = deque(["ne"])
 
 def setsbuf(word):
     global sbuf
@@ -41,13 +42,15 @@ def emit_stack():
 def testeq():
     num1 = stacks[selected].pop()
     num2 = stacks[selected].pop()
-    if num1 == num2:
-        in_condition = True
+    if num1 != num2:
+        in_condition.append(True)
+        extra_funcs.append([])
+        closers.append("qe")
 
 reserved = {"ASC":getasc,"LEN":getbuflen,"emit":emit_stack,"eq":testeq}
 
 def execute(word):
-    if not in_defun:
+    if not in_defun and not in_condition[-1]:
         isnum = re.search("^\d+$",word)
         if isnum:
             stacks[selected].append(int(word))
@@ -57,6 +60,14 @@ def execute(word):
             execute(functions[word])
         if "$" in word:
             setsbuf(word)
+    else:
+        if not in_defun:
+            if word != closers[-1]:
+                extra_funcs[-1].append(word)
+            else:
+                closers.pop()
+                extra_funcs.pop()
+                in_condition.pop()
 
 # NOTE this part of the code is still ugly.
 # -------------------------------------------
@@ -103,4 +114,3 @@ for linum, line in enumerate(code.splitlines()):
 for line in full.keys():
     for word in full[line]:
         execute(word)
-    
