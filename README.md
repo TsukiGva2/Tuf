@@ -28,7 +28,7 @@ main # calling the main function
  def (main)
  
   ~add 1 2 # the ~ metacommand postfixes the word after it, for example, the '~add 1 2' will result in '1 2 add'
-  ~ne 3 # if this will pop 3 and 3 from the stack and apply a NOT operation
+  ~ne 3 # this will pop 3 and 3 from the stack and apply a NOT operation
     # this is the body of the condition
     emit ("this will not be printed since the condition (3 != 3) is false" ASC LEN)
   en # this closes the NE, you can see that it's the inverse of it
