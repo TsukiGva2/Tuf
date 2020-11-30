@@ -2,8 +2,8 @@ def main
     eq (2 2)
 	  eq (2 2) # nested
 	    ne (2 1) # nested nested
-         emit ("yes" ASC LEN)
-		en # closing the if statement
+         	emit ("yes" ASC LEN)
+	    en # closing the if statement
 	  qe
     qe
 endef
