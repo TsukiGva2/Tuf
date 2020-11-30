@@ -2,6 +2,7 @@ from collections import deque
 from sys import argv, exit
 import re
 
+undefs       = deque()
 full         = {}
 strings      = {}
 functions    = {}
@@ -125,6 +126,10 @@ def rot():
 def popall():
     for x in range(len(stacks[selected])):
         stacks[selected].pop()
+        
+def defun():
+    if undefs:
+        
 
 reserved = {"asc":getasc,"len":getbuflen,"emit":emit_stack,
             "eq":testeq,"ne":notest,"gt":greatest,"lt":letest,
@@ -133,26 +138,29 @@ reserved = {"asc":getasc,"len":getbuflen,"emit":emit_stack,
             "mul":mul_last,"mod":mod_last,"pop":lambda: stacks[selected].pop(),
             "dup":lambda: stacks[selected].append(stacks[selected][-1]),
             "swap":swp,"rot":rot,
-            "popall":popall}
+            "popall":popall,"new":lambda: stacks.append(deque()),
+            "select":select,"def":defun}
 
 def execute(word):
     if not in_defun and not in_condition[-1]:
         isnum = re.search("^[+-]?[0-9]+$",word)
         if isnum:
             stacks[selected].append(int(word))
-        if word in reserved:
+        elif word in reserved:
             reserved[word]()
-        if word in functions:
+        elif word in functions:
             execute(functions[word])
-        if "$" in word:
+        elif "$" in word:
             setsbuf(word)
+        else:
+            undefs.append(word)
+        
     else:
         if not in_defun:
             if word != closers[-1]:
                 extra_funcs[-1].append(word)
             else:
                 closers.pop()
-                extra_funcs.pop()
                 in_condition.pop()
 
 # NOTE this part of the code is still ugly.
@@ -204,6 +212,5 @@ for linum, line in enumerate(code.splitlines()):
 
 for line in full.keys():
     for word in full[line]:
-        print("stacks: " + str(stacks))
         execute(word.lower())
-print("stacks: " + str(stacks))
+print("execution reached End Of File, here are the results...\nstacks: " + str(stacks).replace("deque","") + "\nfunctions: " + str(functions) + "\nunused code: " + str(extra_funcs))
