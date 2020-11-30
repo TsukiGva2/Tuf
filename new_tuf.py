@@ -152,7 +152,6 @@ def execute(word):
                 extra_funcs[-1].append(word)
             else:
                 closers.pop()
-                extra_funcs.pop()
                 in_condition.pop()
 
 # NOTE this part of the code is still ugly.
@@ -204,6 +203,5 @@ for linum, line in enumerate(code.splitlines()):
 
 for line in full.keys():
     for word in full[line]:
-        print("stacks: " + str(stacks))
         execute(word.lower())
-print("stacks: " + str(stacks))
+print("execution reached End Of File, here are the results...\nstacks: " + str(stacks).replace("deque","") + "\nfunctions: " + str(functions) + "\nunused code: " + str(extra_funcs))
