@@ -47,7 +47,70 @@ def testeq():
         extra_funcs.append([])
         closers.append("qe")
 
-reserved = {"ASC":getasc,"LEN":getbuflen,"emit":emit_stack,"eq":testeq}
+def notest():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    if num1 == num2:
+        in_condition.append(True)
+        extra_funcs.append([])
+        closers.append("en")
+
+def greatest():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    if num1 < num2:
+        in_condition.append(True)
+        extra_funcs.append([])
+        closers.append("tg")
+
+def letest():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    if num1 > num2:
+        in_condition.append(True)
+        extra_funcs.append([])
+        closers.append("tl")
+
+def print_last():
+    to_print = stacks[selected].pop()
+    print(to_print)
+
+def dump_stack():
+    for item in stacks[selected]:
+        print(item)
+
+def add_last():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    stacks[selected].append(num1+num2)
+
+def sub_last():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    stacks[selected].append(num1-num2)
+
+def div_last():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    if num1 != 0 and num2 != 0:
+        stacks[selected].append(num1/num2)
+
+def mul_last():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    stacks[selected].append(num1*num2)
+
+def pow_last():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    stacks[selected].append(num1**num2)
+
+def mod_last():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    stacks[selected].append(num1%num2)
+
+reserved = {"ASC":getasc,"LEN":getbuflen,"emit":emit_stack,"eq":testeq,"ne":notest,"gt":greatest,"lt":letest,".":print_last,"dumps":dump_stack,"add":add_last,"sub":sub_last,"pow":pow_last,"div":div_last,"mul":mul_last,"mod":mod_last}
 
 def execute(word):
     if not in_defun and not in_condition[-1]:
