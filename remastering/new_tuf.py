@@ -5,8 +5,9 @@ import re
 undefs       = deque()
 full         = {}
 strings      = {}
-functions    = {}
+functions    = {"None":["nop"]}
 in_defun     = False
+curr_defun   = "None"
 stacks       = {0:deque()}
 selected     = 0
 extra_funcs  = [[]]
@@ -128,8 +129,18 @@ def popall():
         stacks[selected].pop()
         
 def defun():
-    if undefs:
-        
+    global in_defun, curr_defun
+    if undefs and in_defun != True:
+        in_defun = True
+        newfunc = undefs.pop()
+        functions[newfunc] = []
+        curr_defun = newfunc
+
+def select():
+    global selected
+    stacknum = stacks[selected].pop()
+    if stacks[stacknum]:
+        selected = stacknum
 
 reserved = {"asc":getasc,"len":getbuflen,"emit":emit_stack,
             "eq":testeq,"ne":notest,"gt":greatest,"lt":letest,
@@ -139,9 +150,10 @@ reserved = {"asc":getasc,"len":getbuflen,"emit":emit_stack,
             "dup":lambda: stacks[selected].append(stacks[selected][-1]),
             "swap":swp,"rot":rot,
             "popall":popall,"new":lambda: stacks.append(deque()),
-            "select":select,"def":defun}
+            "select":select,"def":defun,"nop":lambda: 1+1}
 
 def execute(word):
+    global in_defun
     if not in_defun and not in_condition[-1]:
         isnum = re.search("^[+-]?[0-9]+$",word)
         if isnum:
@@ -149,7 +161,8 @@ def execute(word):
         elif word in reserved:
             reserved[word]()
         elif word in functions:
-            execute(functions[word])
+            for wd in functions[word]:
+                execute(wd)
         elif "$" in word:
             setsbuf(word)
         else:
@@ -162,6 +175,11 @@ def execute(word):
             else:
                 closers.pop()
                 in_condition.pop()
+        else:
+            if word == "endef":
+                in_defun = False
+            else:
+                functions[curr_defun].append(word)
 
 # NOTE this part of the code is still ugly.
 # -------------------------------------------

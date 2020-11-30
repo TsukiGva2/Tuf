@@ -2,10 +2,12 @@ from collections import deque
 from sys import argv, exit
 import re
 
+undefs       = deque()
 full         = {}
 strings      = {}
-functions    = {}
+functions    = {"None":["nop"]}
 in_defun     = False
+curr_defun   = "None"
 stacks       = {0:deque()}
 selected     = 0
 extra_funcs  = [[]]
@@ -125,6 +127,20 @@ def rot():
 def popall():
     for x in range(len(stacks[selected])):
         stacks[selected].pop()
+        
+def defun():
+    global in_defun, curr_defun
+    if undefs and in_defun != True:
+        in_defun = True
+        newfunc = undefs.pop()
+        functions[newfunc] = []
+        curr_defun = newfunc
+
+def select():
+    global selected
+    stacknum = stacks[selected].pop()
+    if stacks[stacknum]:
+        selected = stacknum
 
 reserved = {"asc":getasc,"len":getbuflen,"emit":emit_stack,
             "eq":testeq,"ne":notest,"gt":greatest,"lt":letest,
@@ -133,19 +149,25 @@ reserved = {"asc":getasc,"len":getbuflen,"emit":emit_stack,
             "mul":mul_last,"mod":mod_last,"pop":lambda: stacks[selected].pop(),
             "dup":lambda: stacks[selected].append(stacks[selected][-1]),
             "swap":swp,"rot":rot,
-            "popall":popall}
+            "popall":popall,"new":lambda: stacks.append(deque()),
+            "select":select,"def":defun,"nop":lambda: 1+1}
 
 def execute(word):
+    global in_defun
     if not in_defun and not in_condition[-1]:
         isnum = re.search("^[+-]?[0-9]+$",word)
         if isnum:
             stacks[selected].append(int(word))
-        if word in reserved:
+        elif word in reserved:
             reserved[word]()
-        if word in functions:
-            execute(functions[word])
-        if "$" in word:
+        elif word in functions:
+            for wd in functions[word]:
+                execute(wd)
+        elif "$" in word:
             setsbuf(word)
+        else:
+            undefs.append(word)
+        
     else:
         if not in_defun:
             if word != closers[-1]:
@@ -153,6 +175,11 @@ def execute(word):
             else:
                 closers.pop()
                 in_condition.pop()
+        else:
+            if word == "endef":
+                in_defun = False
+            else:
+                functions[curr_defun].append(word)
 
 # NOTE this part of the code is still ugly.
 # -------------------------------------------

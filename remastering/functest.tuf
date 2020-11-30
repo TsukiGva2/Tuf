@@ -1,0 +1,4 @@
+~def func
+	emit ("hoi" asc len)
+endef
+func
