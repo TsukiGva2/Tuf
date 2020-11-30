@@ -58,7 +58,7 @@ def notest():
 def greatest():
     num1 = stacks[selected].pop()
     num2 = stacks[selected].pop()
-    if num1 < num2:
+    if num1 >= num2:
         in_condition.append(True)
         extra_funcs.append([])
         closers.append("tg")
@@ -66,7 +66,7 @@ def greatest():
 def letest():
     num1 = stacks[selected].pop()
     num2 = stacks[selected].pop()
-    if num1 > num2:
+    if num1 <= num2:
         in_condition.append(True)
         extra_funcs.append([])
         closers.append("tl")
@@ -110,11 +110,34 @@ def mod_last():
     num2 = stacks[selected].pop()
     stacks[selected].append(num1%num2)
 
-reserved = {"ASC":getasc,"LEN":getbuflen,"emit":emit_stack,"eq":testeq,"ne":notest,"gt":greatest,"lt":letest,".":print_last,"dumps":dump_stack,"add":add_last,"sub":sub_last,"pow":pow_last,"div":div_last,"mul":mul_last,"mod":mod_last}
+def swp():
+    current_top = stacks[selected].pop()
+    new_top = stacks[selected].pop()
+    stacks[selected].append(current_top)
+    stacks[selected].append(new_top)
+
+def rot():
+    num1 = stacks[selected].pop()
+    num2 = stacks[selected].pop()
+    num3 = stacks[selected].pop()
+    stacks[selected].extend([num1,num2,num3])
+    
+def popall():
+    for x in range(len(stacks[selected])):
+        stacks[selected].pop()
+
+reserved = {"asc":getasc,"len":getbuflen,"emit":emit_stack,
+            "eq":testeq,"ne":notest,"gt":greatest,"lt":letest,
+            ".":print_last,"dumps":dump_stack,"add":add_last,
+            "sub":sub_last,"pow":pow_last,"div":div_last,
+            "mul":mul_last,"mod":mod_last,"pop":lambda: stacks[selected].pop(),
+            "dup":lambda: stacks[selected].append(stacks[selected][-1]),
+            "swap":swp,"rot":rot,
+            "popall":popall}
 
 def execute(word):
     if not in_defun and not in_condition[-1]:
-        isnum = re.search("^\d+$",word)
+        isnum = re.search("^[+-]?[0-9]+$",word)
         if isnum:
             stacks[selected].append(int(word))
         if word in reserved:
@@ -152,6 +175,7 @@ for linum, line in enumerate(code.splitlines()):
     # regexes that only iq > 420 can read (obviously not me)
     is_string      = re.search("\"(.+?)\"",line)
     has_precedence = re.search("\((.+?)\)",line)
+    postpost       = re.search("\~[A-Za-z]+",line)
                      # this will match -> (anything here)
     
     cut            = re.findall("\_(.+?)\_",line) # match _this_
@@ -171,9 +195,15 @@ for linum, line in enumerate(code.splitlines()):
     if has_precedence != None:
         # moving strings around
         line = has_precedence.group(1) + " " + line.replace(has_precedence.group(),"") # string + string = bad code
-
+    if postpost != None:
+        # moving strings around again
+        line = line.replace(postpost.group(),"") + " " + postpost.group()
+        line = line.replace("~","")
+    
     full[linum] = line.split()
 
 for line in full.keys():
     for word in full[line]:
-        execute(word)
+        print("stacks: " + str(stacks))
+        execute(word.lower())
+print("stacks: " + str(stacks))

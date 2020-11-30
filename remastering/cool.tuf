@@ -1,18 +1,25 @@
 def main
-    2 2 eq
-	2 2 eq
-		1 2 eq
-        		emit ("no" ASC LEN)
-		qe
-	qe
-    qe
-    2 2 eq
-	2 2 eq
-		2 2 eq
-        		emit ("yes" ASC LEN)
-		qe
-	qe
+    eq (2 2)
+	  eq (2 2) # nested
+	    ne (2 1) # nested nested
+         emit ("yes" ASC LEN)
+		en # closing the if statement
+	  qe
     qe
 endef
 
 main
+
+1 (2) sub
+
+~lt 1
+  emit ("here" ASC LEN)
+  2 2 div
+tl
+
+1 2 3 4 5 dup pop swap rot
+
+dumps
+popall
+
+1 2 add
